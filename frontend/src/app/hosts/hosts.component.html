@@ -1,0 +1,18 @@
+<div class="row">
+
+        <h1>Hosts file</h1>
+</div>
+
+<div class="row">
+    <textarea placeholder="Loading hosts file..." [(ngModel)]="result"></textarea>
+</div>
+
+<div class="row">
+    <button (click)="save()" [disabled]="disableSaveButton">Save changes</button>
+</div>
+
+<div *ngIf="isLoading" class="loading-overlay">
+    <div class="loader"></div>
+</div>
+
+

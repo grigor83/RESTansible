@@ -1,0 +1,11 @@
+---
+- name: Delete loopback interface on cisco router
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  tasks:
+    - name: Delete Loopback0 interface
+      ios_config:
+        lines:
+          - no interface Loopback0
+        save_when: modified

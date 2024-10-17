@@ -1,0 +1,38 @@
+<div class="background-image">
+
+    <form #registerForm="ngForm" method="post" (ngSubmit)="register(registerForm)" ngNativeValidate>
+        <div class="row">
+            <img class="rounded-image" src="/assets/img/mtel.png">
+        </div>
+        
+        <h1>Sign up</h1>
+
+        <div class="row" style="margin-top: 15px;">
+            <div class="column" style="margin-right: 20px;">
+                <label>Name: </label>
+                <input type="text" [(ngModel)]="name" name="name" required autofocus>
+
+                <label>Username: </label>
+                <input type="text" [(ngModel)]="username" name="username" required>
+
+                <label>Phone number: </label>
+                <input type="text" [(ngModel)]="phoneNumber" name="phoneNumber" pattern="0[0-9]{8}" required >
+            </div>
+            <div class="column">
+                <label>Last name: </label>
+                <input type="text" [(ngModel)]="lastname" name="lastname" required>
+
+                <label>Password: </label>
+                <input type="password" [(ngModel)]="password" name="password" required>
+
+                <label>Email: </label>
+                <input type="email" [(ngModel)]="email" name="email" required>
+            </div>
+        </div>
+        
+        <input type="submit" value="Sign up">  
+        <input type="button" value="Sign in" (click)="login()">
+    </form>
+
+</div>
+

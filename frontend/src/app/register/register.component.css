@@ -1,0 +1,87 @@
+.background-image {
+    background-image: url('/assets/img/background.png');
+    background-size: cover;
+    background-position: center;
+    height: 100vh; /* Full height */
+    width: 100%;   /* Full width */
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.rounded-image {
+    width: 155px;
+    height: 155px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 100%;
+    flex-grow: 0;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 50%;
+    flex-grow: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    width: 50%;
+    height: fit-content;
+    box-sizing: border-box;
+    position: absolute;
+    left: 10%;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border-color: lightslategray;
+    box-sizing: border-box;
+}
+
+input[type=submit], input[type=button]{
+    margin-top: 15px;
+    background-color: rgba(9, 0, 128, 0.603);
+    color: white;
+}
+
+h1{
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    form {
+        left: 0;
+        padding: 15px;
+        width: 100%;
+    }
+    .column {
+        margin: 0;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+    input, label {
+        width: 100%;
+        font-size: 2vw;
+    }
+    h1{
+        font-size: 5vw;
+    }
+    p{
+        font-size: 2vw;
+    }
+}

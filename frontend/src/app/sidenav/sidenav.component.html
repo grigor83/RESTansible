@@ -1,0 +1,20 @@
+<div class="background-image">
+    
+    <div class="sidenav" *ngIf="showSidenav">
+        <img class="rounded-image" src="assets/img/mtel.png">
+    
+        <!--
+            To change the background color of a link when it is clicked in the sidenav, you can use Angular's routerLinkActive directive. 
+            This directive applies a CSS class to the link when it is active (i.e., when its route is currently loaded). 
+        -->
+        <a routerLink="/devices" routerLinkActive="active">Play</a>
+        <a routerLink="/playbooks" routerLinkActive="active">Playbooks</a>
+        <a routerLink="/hosts" routerLinkActive="active">Hosts</a>
+        <a routerLink="/login" routerLinkActive="active" (click)="logout()">Logout</a>
+    </div>
+    
+    <div class="main-content">
+        <router-outlet></router-outlet>
+    </div>
+
+</div>
