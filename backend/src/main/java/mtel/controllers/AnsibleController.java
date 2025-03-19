@@ -1,5 +1,6 @@
 package mtel.controllers;
 
+import mtel.model.Playbook;
 import mtel.services.AnsibleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +18,19 @@ public class AnsibleController {
         this.ansibleService = ansibleService;
     }
 
-    @GetMapping("/{playbookId}")
-    public ResponseEntity<?> runPlaybook(@PathVariable Integer playbookId) {
+    @PostMapping()
+    public ResponseEntity<?> runPlaybook(@RequestBody Playbook playbook) {
         try {
-            return ResponseEntity.ok().body(ansibleService.runPlaybook(playbookId));
+            return ResponseEntity.ok().body(ansibleService.runPlaybook(playbook));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
+
+
+
+
 
     @GetMapping("/playbooks/{playbookId}")
     public ResponseEntity<?> loadPlaybook(@PathVariable Integer playbookId) {
@@ -35,10 +41,10 @@ public class AnsibleController {
         }
     }
 
-    @PutMapping("/playbooks/{playbookId}")
-    public ResponseEntity<?> updatePlaybook(@PathVariable Integer playbookId,
+    @PutMapping("/playbooks/{playbookName}")
+    public ResponseEntity<?> updatePlaybook(@PathVariable String playbookName,
                                             @RequestBody String content) throws IOException, InterruptedException {
-        ansibleService.updatePlaybook(playbookId, content);
+        ansibleService.updatePlaybook(playbookName, content);
         return ResponseEntity.ok().build();
     }
 

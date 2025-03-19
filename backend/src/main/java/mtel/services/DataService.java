@@ -37,7 +37,7 @@ public class DataService {
     private void executeCommand(List<String> lists, String bashCommand) throws IOException, InterruptedException {
         // Create a process builder
         ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", bashCommand);
-        processBuilder.directory(AnsibleService.directory);
+        processBuilder.directory(AnsibleService.ANSIBLE_DIR);
         processBuilder.redirectErrorStream(true);
         // Start the process
         Process process = processBuilder.start();

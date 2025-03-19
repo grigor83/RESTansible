@@ -1,19 +1,38 @@
 
 [iosxe]
 csr1000v-1 ansible_host=devnetsandboxiosxe.cisco.com
-drugi_ruter ansible_host=sandbox-iosxr-1.cisco.com
 
 [iosxe:vars]
+ansible_connection=ansible.netcommon.network_cli
 ansible_user=admin
 ansible_password=C1sco12345
-ansible_connection=network_cli
-ansible_network_os=ios
+ansible_ssh_pass=C1sco12345
 ansible_become=yes
 ansible_become_method=enable
+ansible_network_os=cisco.ios.ios
+ansible_port=22
 subnet_id=50
 
+bezvezni ansible_host=devnetsandboxiosxe.cisco.com
+
+[iosxr]
+drugi_ruter ansible_host=sandbox-iosxr-1.cisco.com
+
+[iosxr:vars]
+ansible_connection=ansible.netcommon.network_cli
+ansible_user=admin
+ansible_password=C1sco12345
+ansible_ssh_pass=C1sco12345
+ansible_become=yes
+ansible_become_method=enable
+ansible_network_os=iosxr
+ansible_port=22
+subnet_id=50
+
+
+
 [switches]
-cat9k ansible_host=172.16.30.101
+cat9k ansible_host=10.10.20.100
 
 [nso]
 treci_ruter ansible_host=sbx-nxos-mgmt.cisco.com
@@ -23,7 +42,5 @@ ansible_user=admin
 ansible_password=Admin_1234!
 ansible_connection=network_cli
 ansible_network_os=ios
-ansible_become=yes
-ansible_become_method=enable
 ansible_port=22
 subnet_id=50

@@ -1,10 +1,12 @@
 package mtel.services;
 
+import mtel.model.Playbook;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +14,10 @@ import java.util.Map;
 @Service
 public class AnsibleService {
     // Specify the directory where you want to execute the command
-    public static final File directory = new File(System.getProperty("user.dir")
+    public static final File ANSIBLE_DIR = new File(System.getProperty("user.dir")
             + File.separator + "src\\main\\resources\\ansible");
+    public static final List<String> PLAYBOOKS_NAMES = List.of("create_loopback0.yaml", "create_loopbacks.yaml",
+            "delete_loopback0.yaml", "interfaces_facts.yaml", "ios_facts.yaml", "list_interfaces.yaml");
 
     private final DataService dataService;
 
@@ -21,13 +25,17 @@ public class AnsibleService {
         this.dataService = dataService;
     }
 
-    public Map<String, String> runPlaybook(Integer playbookId) throws Exception {
+    public Map<String, String> runPlaybook(Playbook playbook) throws Exception {
         Map<String, String> response = new HashMap<>();
 
-        String bashCommand = choosePlaybook(playbookId);
+        //String bashCommand = choosePlaybook(playbookName);
         // Create a process builder
-        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", bashCommand);
-        processBuilder.directory(directory);
+        //ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", bashCommand);
+        ProcessBuilder processBuilder = new ProcessBuilder("wsl", "ansible-playbook", "-i",  "hosts", playbook.getFilename());
+        //ProcessBuilder processBuilder = new ProcessBuilder("wsl", "ansible-playbook",  "-i",  "hosts", "interfaces_facts.yaml");
+        if (PLAYBOOKS_NAMES.contains(playbook.getFilename())) {
+            processBuilder.directory(ANSIBLE_DIR);
+        }
         processBuilder.redirectErrorStream(true);
         // Start the process
         Process process = processBuilder.start();
@@ -48,11 +56,13 @@ public class AnsibleService {
         return response;
     }
 
-    private String choosePlaybook(Integer playbookId) {
-        String command = "bash -c \"/home/grigor/.local/bin/ansible-playbook -i hosts ";
-        String playbook = dataService.getPlaybooksNames().get(playbookId) + "\"";
-
-        return command + playbook;
+    private String choosePlaybook(String playbookName) {
+        //String command = "bash -c \"/home/grigor/.local/bin/ansible-playbook -i hosts ";
+        String[] command = new String[]{"ansible-playbook",  "-i",  "hosts"};
+        //String playbook = dataService.getPlaybooksNames().get(playbookId) + "\"";
+        //String[] command2 = new String[]{"ansible-playbook",  "-i",  "hosts", "interfaces_facts.yaml"};
+        System.out.println(Arrays.toString(command));
+        return Arrays.toString(command) + playbookName + "\"";
     }
 
     public Map<String, String> loadPlaybook(Integer playbookId) throws IOException, InterruptedException {
@@ -67,10 +77,11 @@ public class AnsibleService {
         return response;
     }
 
-    public void updatePlaybook(Integer playbookId, String content) throws IOException {
+    public void updatePlaybook(String playbookName, String content) throws IOException {
         List<String> lines = List.of(content.split("\n"));
-        Files.write(Paths.get(directory.getAbsolutePath() + File.separator
-                + dataService.getPlaybooksNames().get(playbookId)), lines);
+        Files.write(Paths.get(ANSIBLE_DIR.getAbsolutePath() + File.separator + playbookName), lines);
+//        Files.write(Paths.get(ANSIBLE_DIR.getAbsolutePath() + File.separator
+//                + dataService.getPlaybooksNames().get(playbookId)), lines);
     }
 
     public Object getHostsFile() throws IOException, InterruptedException {
@@ -87,12 +98,12 @@ public class AnsibleService {
 
     public void updateHostsFile(String content) throws IOException {
         List<String> lines = List.of(content.split("\n"));
-        Files.write(Paths.get(directory.getAbsolutePath() + File.separator + "hosts"), lines);
+        Files.write(Paths.get(ANSIBLE_DIR.getAbsolutePath() + File.separator + "hosts"), lines);
     }
 
     private void executeCommand(StringBuilder outputBuffer, String bashCommand) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", bashCommand);
-        processBuilder.directory(AnsibleService.directory);
+        processBuilder.directory(AnsibleService.ANSIBLE_DIR);
         processBuilder.redirectErrorStream(true);
         // Start the process
         Process process = processBuilder.start();
