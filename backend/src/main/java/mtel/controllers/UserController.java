@@ -1,7 +1,6 @@
 package mtel.controllers;
 
-import jakarta.validation.Valid;
-import mtel.models.User;
+import mtel.model.User;
 import mtel.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +18,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody UserService.LoginRequest loginRequest) {
-        User user = userService.loginUser(loginRequest);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        User u = userService.loadUser(user);
+
+        if (u == null)
+            return ResponseEntity.notFound().build();
+        else
+            return ResponseEntity.ok().body(u);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
-        System.out.println(user);
-        userService.registerUser(user);
-        return ResponseEntity.ok().body(HttpStatus.ACCEPTED);
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        User u = userService.saveUser(user);
+
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } else
+            return ResponseEntity.status(HttpStatus.OK).build();
     }
+
 }

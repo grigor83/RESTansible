@@ -1,7 +1,7 @@
 package mtel.repository;
 
 import jakarta.validation.constraints.NotBlank;
-import mtel.models.User;
+import mtel.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
