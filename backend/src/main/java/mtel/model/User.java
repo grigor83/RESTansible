@@ -1,10 +1,11 @@
-package mtel.models;
+package mtel.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import lombok.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -20,16 +21,6 @@ public class User {
 
     @NotBlank
     @Basic
-    @Column(name = "name")
-    private String name;
-
-    @NotBlank
-    @Basic
-    @Column(name = "lastname")
-    private String lastname;
-
-    @NotBlank
-    @Basic
     @Column(name = "username")
     private String username;
 
@@ -38,15 +29,22 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @NotNull
-    @Email
+    @NotBlank
+    @Basic
+    @Column(name = "phone")
+    private String phone;
+
+    @NotBlank
     @Basic
     @Column(name = "email")
     private String email;
 
-    @ValidPhoneNumber
-    @Basic
-    @Column(name = "phone")
-    private String phoneNumber;
+    @OneToMany(mappedBy ="user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Inventory> inventories;
+
+    @OneToMany(mappedBy ="user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Playbook> playbooks;
 
 }
