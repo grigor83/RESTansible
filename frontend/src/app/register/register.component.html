@@ -9,19 +9,13 @@
 
         <div class="row" style="margin-top: 15px;">
             <div class="column" style="margin-right: 20px;">
-                <label>Name: </label>
-                <input type="text" [(ngModel)]="name" name="name" required autofocus>
-
                 <label>Username: </label>
-                <input type="text" [(ngModel)]="username" name="username" required>
+                <input type="text" [(ngModel)]="username" name="username" required autofocus>
 
                 <label>Phone number: </label>
                 <input type="text" [(ngModel)]="phoneNumber" name="phoneNumber" pattern="0[0-9]{8}" required >
             </div>
             <div class="column">
-                <label>Last name: </label>
-                <input type="text" [(ngModel)]="lastname" name="lastname" required>
-
                 <label>Password: </label>
                 <input type="password" [(ngModel)]="password" name="password" required>
 

@@ -12,8 +12,6 @@ import { User } from '../models/user';
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  name!: string;
-  lastname!: string;
   username!: string;
   password!: string;
   phoneNumber!: string;
@@ -22,7 +20,7 @@ export class RegisterComponent {
   constructor(private router: Router, private userService: UserService) {}
 
   register(registerForm: NgForm) {
-    const user = new User(this.name, this.lastname, this.username, this.password, this.phoneNumber, this.email);
+    const user = new User(this.username, this.password, this.phoneNumber, this.email);
 
     this.userService.register(user).subscribe({
       next: response => {

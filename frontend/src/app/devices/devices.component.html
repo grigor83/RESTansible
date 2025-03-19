@@ -2,21 +2,21 @@
 <div class="row">
     <div class="column">
         <h2>Devices:</h2>
-        <select (change)="onDeviceSelected($event)">
-            <option *ngFor="let device of devicesNames" [value]="device">
-              {{ device }}
-            </option>
-          </select>
-    </div>
-    
-    <div class="column">
-        <h2>Playbooks:</h2>
-        <select [(ngModel)]="selectedPlaybook">
-          <option *ngFor="let playbook of playbookNames; let i = index" [value]="i">
-            {{ playbook }}
+        <select [(ngModel)]="selectedHost" (ngModelChange)="onHostChange()">
+          <option *ngFor="let host of hosts" [ngValue]="host">
+            {{ host.name }}
           </option>
-        </select>
+        </select>        
     </div>
+
+    <div class="column">
+      <h2>Playbooks:</h2>
+      <select [(ngModel)]="selectedPlaybook" [disabled]="!selectedHost">
+        <option *ngFor="let playbook of playbooks" [ngValue]="playbook">
+          {{ playbook.filename }}
+        </option>
+      </select>
+  </div>
 </div>
 
 <div class="row">

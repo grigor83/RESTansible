@@ -10,19 +10,36 @@ export class PlaybookService {
 
   constructor(private http: HttpClient) { }
 
-  play(playbookId: number) {
-    return this.http.get<any>(`${this.url}/${playbookId}`);
+
+
+  play(playbook: any) {
+    return this.http.post<any>(`${this.url}`, playbook);
   }
 
-  loadPlaybookContent(playbookId: number) {
-    const url = 'http://localhost:8080/ansible/playbooks';
-    return this.http.get<any>(`${url}/${playbookId}`);
+  getPlaybooks(userId: number|undefined) {
+    const url = 'http://localhost:8080/playbooks';
+    return this.http.get<any>(`${url}/${userId}`);
+  }
+
+  loadPlaybookContent(playbook: any) {
+    const url = 'http://localhost:8080/playbooks/content';
+    return this.http.get(`${url}/${playbook.id}`, { responseType: 'text' });
   }
 
   updatePlaybookContent(playbookId: number, newContent: any) {
-    const url = 'http://localhost:8080/ansible/playbooks';
-    return this.http.put<any>(`${url}/${playbookId}`, newContent);
+    const url = 'http://localhost:8080/playbooks';
+    return this.http.put(`${url}/${playbookId}`, newContent, { responseType: 'text' });
   }
+
+  createPlaybook(userId: number|undefined, filename: string, content: string) {
+    const url = 'http://localhost:8080/playbooks';
+    return this.http.post(`${url}`, { userId, filename, content });
+  }
+
+
+
+
+  
 
   loadHostsFile() {
     const url = 'http://localhost:8080/ansible/hosts';
@@ -36,14 +53,5 @@ export class PlaybookService {
     return this.http.put<any>(`${url}`, newContent);
   }
 
-  loadDevicesNames() {
-    const url = 'http://localhost:8080/data/devices';
-    return this.http.get<any>(url);
-  }
-
-  loadPlaybookNames() {
-    const url = 'http://localhost:8080/data/playbooks';
-    return this.http.get<any>(url);
-  }
 
 }

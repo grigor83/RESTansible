@@ -2,6 +2,8 @@ import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { PlaybookService } from '../services/playbook.service';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../services/user.service';
+import { InventoryService } from '../services/inventory.service';
 
 @Component({
   selector: 'app-devices',
@@ -12,37 +14,34 @@ import { FormsModule } from '@angular/forms';
 })
 export class DevicesComponent implements OnInit {
 
-  devicesNames: string[] = [];
-  selectedDevices: string = '';
-  playbookNames: string[] = [];
-  selectedPlaybook: number = 0;
+  hosts: any[] = [];
+  selectedHost: any;
+  playbooks: any[] = [];
+  selectedPlaybook: any;
   result: string = '';
   isLoading: boolean = false;
 
-  constructor(private playbookService: PlaybookService) {}
+  constructor(private inventoryService: InventoryService, private playbookService: PlaybookService, private userService: UserService) {}
 
   ngOnInit(): void {
-    this.playbookService.loadDevicesNames().subscribe({
-      next: response => {
-        this.devicesNames = response;
-      },
-      error: error => {
-        this.isLoading = false;
-      }
-    });
-
-    this.playbookService.loadPlaybookNames().subscribe({
-      next: response => {
-        this.playbookNames = response;
-      },
-      error: error => {
-        this.isLoading = false;
-      }
-    });
+    if (this.userService.activeUser != null){
+      this.inventoryService.getHostsAndPlaybooks(this.userService.activeUser.id).subscribe({
+        next: response => {
+          this.hosts = response;
+          this.selectedHost = this.hosts[0]
+          this.playbooks = this.selectedHost.playbooks;
+          this.selectedPlaybook = this.playbooks[0];
+        },
+        error: error => {
+          this.isLoading = false;
+        }
+      });
+     }
   }
 
-  onDeviceSelected(event: any): void {
-    this.selectedDevices = event.target.value;
+  onHostChange() {
+    this.playbooks = this.selectedHost.playbooks;
+    this.selectedPlaybook = this.playbooks[0];
   }
 
   play() {

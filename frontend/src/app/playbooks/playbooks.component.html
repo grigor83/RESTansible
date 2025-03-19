@@ -3,8 +3,8 @@
     <div class="column">
         <h2>Playbooks:</h2>
         <select [(ngModel)]="selectedPlaybook" (change)="onPlaybookSelected($event)">
-          <option *ngFor="let playbook of playbookNames; let i = index" [value]="i">
-            {{ playbook }}
+          <option *ngFor="let playbook of playbooks" [ngValue]="playbook">
+            {{ playbook.filename }}
           </option>
         </select>
     </div>
@@ -17,7 +17,24 @@
 <div class="row">
     <button (click)="load()">Load playbook</button>
     <button (click)="save()" [disabled]="disableSaveButton">Save playbook</button>
+    <button (click)="openModal()">Create playbook</button>
 </div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h2>Create new playbook</h2>
+    <label style="margin-top: 15px;">Playbook name: </label>
+    <input type="text" [(ngModel)]="filename" placeholder="Enter filename (e.g., playbook)" style="width: 17%">
+    <div class="row">
+      <textarea placeholder="Enter playbooks content..." [(ngModel)]="result" style="width: 50vw;"></textarea>
+    </div>
+    <div>
+      <button (click)="createPlaybook()">OK</button>
+      <button (click)="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 
 <div *ngIf="isLoading" class="loading-overlay">
   <div class="loader"></div>
