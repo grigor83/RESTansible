@@ -1,4 +1,4 @@
-package mtel;
+package ansible;
 
 import org.springframework.stereotype.Component;
 

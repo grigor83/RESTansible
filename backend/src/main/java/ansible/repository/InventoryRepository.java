@@ -1,7 +1,7 @@
-package mtel.repository;
+package ansible.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import mtel.model.Inventory;
+import ansible.model.Inventory;
 
 import java.util.List;
 import java.util.Optional;

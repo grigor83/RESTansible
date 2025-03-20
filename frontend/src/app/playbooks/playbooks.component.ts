@@ -84,6 +84,7 @@ export class PlaybooksComponent implements OnInit {
       return;
     }
 
+    this.isLoading = false;
     if (this.filename.includes(".")){
       this.filename = this.filename.split(".")[0];
     }
@@ -111,6 +112,27 @@ export class PlaybooksComponent implements OnInit {
   closeModal() {
     this.filename = '';
     this.isModalOpen = false;
+  }
+
+  delete(){
+    this.isLoading = true;
+
+    this.playbookService.deletePlaybook(this.selectedPlaybook.id)
+    .subscribe({
+      next: response => {
+        alert('Deleted playbook ' + this.selectedPlaybook.filename + ' succesfully!')
+        this.playbooks = this.playbooks.filter(playbook => playbook.id != this.selectedPlaybook.id)
+        this.selectedPlaybook = this.playbooks[0];
+        this.disableSaveButton = true;
+        this.result = '';
+        this.isLoading = false;
+      },
+      error: error => {
+        alert("Error in deleting playbook file!")
+        this.disableSaveButton = true;
+        this.isLoading = false;
+      }
+    });
   }
 
 }

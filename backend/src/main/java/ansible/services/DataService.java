@@ -1,4 +1,4 @@
-package mtel.services;
+package ansible.services;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;

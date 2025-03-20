@@ -1,11 +1,8 @@
-package mtel.model;
+package ansible.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Data
@@ -38,13 +35,5 @@ public class User {
     @Basic
     @Column(name = "email")
     private String email;
-
-    @OneToMany(mappedBy ="user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Inventory> inventories;
-
-    @OneToMany(mappedBy ="user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Playbook> playbooks;
 
 }

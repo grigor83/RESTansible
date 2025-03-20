@@ -1,4 +1,4 @@
-package mtel;
+package ansible;
 
 import jakarta.validation.constraints.NotBlank;
 

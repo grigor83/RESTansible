@@ -36,21 +36,9 @@ export class PlaybookService {
     return this.http.post(`${url}`, { userId, filename, content });
   }
 
-
-
-
-  
-
-  loadHostsFile() {
-    const url = 'http://localhost:8080/ansible/hosts';
-    return this.http.get<any>(url);
-  }
-
-  updateHostsFile(newContent: string) {
-    console.log('update hosts')
-
-    const url = 'http://localhost:8080/ansible/hosts';
-    return this.http.put<any>(`${url}`, newContent);
+  deletePlaybook(playbookId: any) {
+    const url = 'http://localhost:8080/playbooks';
+    return this.http.delete(`${url}/${playbookId}`, { responseType: 'text' });
   }
 
 

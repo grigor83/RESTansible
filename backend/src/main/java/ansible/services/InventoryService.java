@@ -1,27 +1,26 @@
-package mtel.services;
+package ansible.services;
 
 import jakarta.transaction.Transactional;
-import mtel.dto.HostDTO;
-import mtel.model.Inventory;
-import mtel.model.Playbook;
-import mtel.repository.InventoryRepository;
-import mtel.repository.UserRepository;
+import ansible.dto.HostDTO;
+import ansible.model.Inventory;
+import ansible.model.Playbook;
+import ansible.repository.InventoryRepository;
+import ansible.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static ansible.RestAnsibleApplication.readFileFromResources;
 
 @Service
 @Transactional
@@ -40,57 +39,65 @@ public class InventoryService {
         this.playbookService = playbookService;
     }
 
-    public List<Inventory> loadInventories(int userId) {
+    public List<Inventory> getInventories(int userId) {
         return inventoryRepository.findByUserIdOrUserIdIsNull(userId);
     }
 
-    public UrlResource loadFile(String filename) throws MalformedURLException {
-        Inventory inventory = inventoryRepository.findByFilename(filename);
-        Path filePath = Paths.get(inventory.getFilepath());
-        UrlResource resource = new UrlResource(filePath.toUri());
-
-        if (resource.exists() || resource.isReadable()) {
-            return resource;
-        } else {
-            throw new RuntimeException("Could not read file: " + filename);
+    public String loadPlaybookContent(Integer inventoryId) throws IOException {
+        Optional<Inventory> inventory = inventoryRepository.findById(inventoryId);
+        if (inventory.isEmpty()) {
+            throw new IOException("Playbook not found");
         }
+
+        if (inventory.get().getFilepath() == null)
+            return readFileFromResources(inventory.get().getFilename());
+
+        return Files.readString(Path.of(inventory.get().getFilepath()));
     }
 
-
-    public String saveFile(MultipartFile file, Integer userId) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("Fajl ne sme biti prazan!");
+    public String updateFile(Integer inventoryId, String content) throws IOException {
+        Optional<Inventory> inventory = inventoryRepository.findById(inventoryId);
+        if (inventory.isEmpty()) {
+            throw new IOException("Inventory not found");
         }
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir, fileName);
+        if (inventory.get().getFilepath() == null)
+            throw new IOException("Cannot update inventory in resources!");
+
+        Files.writeString(Path.of(inventory.get().getFilepath()), content);
+        return "Playbook updated successfully.";
+    }
+
+    public Inventory createFile(Integer userId, String filename, String content) throws IOException {
+        if (userId == null || filename == null || filename.isEmpty() ||
+                content == null || content.isEmpty()) {
+            throw new IOException("User ID, filename or content cannot be empty");
+        }
+
+        Path filePath = Paths.get(uploadDir, UUID.randomUUID() + "_" + filename);
         // Kreiraj upload folder ako ne postoji
         Files.createDirectories(filePath.getParent());
-        Files.write(filePath, file.getBytes());
+        Files.writeString(filePath, content);
 
-        // Sačuvaj playbook u bazu
         Inventory inventory = new Inventory();
-        inventory.setFilename(file.getOriginalFilename());
-        inventory.setFilepath(filePath.toString());
         inventory.setUser(userRepository.findById(userId).get());
-        inventory = inventoryRepository.save(inventory);
-        System.out.println(inventory);
+        inventory.setFilename(filename);
+        inventory.setFilepath(filePath.toString());
 
-        return "Inventory uploaded successfully: " + fileName;
+        return inventoryRepository.save(inventory);
     }
 
-    public String updateFile(MultipartFile file, int inventoryId) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("Fajl ne sme biti prazan!");
+    public String deleteInventory(Integer id) throws IllegalArgumentException, IOException {
+        if (inventoryRepository.existsById(id)) {
+            Optional<Inventory> inventory = inventoryRepository.findById(id);
+            if (inventory.get().getFilepath() == null)
+                throw new IllegalArgumentException("Playbook from recources cannot be deleted!");
+            inventoryRepository.deleteById(id);
+            Files.delete(Path.of(inventory.get().getFilepath()));
+            return "Playbook deleted successfully.";
         }
 
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElse(null);
-        if (inventory == null) {
-            throw new IllegalArgumentException("Inventory not found!");
-        }
-        Files.write(Path.of(inventory.getFilepath()), file.getBytes());
-
-        return "Inventory updated successfully: " + inventory.getFilename();
+        throw new IllegalArgumentException("Playbook id is invalid!");
     }
 
     public List<HostDTO> loadHostsNames(int userId) throws IOException {
@@ -117,7 +124,6 @@ public class InventoryService {
 
         List<HostDTO> hosts = parseNames(names);
         loadPlaybooksForHosts(userId, hosts);
-        //playbookService.loadPlaybooksForHosts(userId, hosts);
 
         return hosts;
     }
@@ -125,7 +131,7 @@ public class InventoryService {
     private void loadPlaybooksForHosts(int userId, List<HostDTO> hosts) throws IOException {
         Map<String, List<String>> fileNames = new LinkedHashMap<>();
 
-        //Ucitava sve playbooks i provjerava da li sadrze ima hosta u svom sadrzaju
+        //Ucitava sve playbooks i provjerava da li sadrze ime hosta u svom sadrzaju
         List<Playbook> userPlaybooks = playbookService.getPlaybooks(userId);
         if (!userPlaybooks.isEmpty()) {
             for (Playbook playbook : userPlaybooks) {
@@ -133,7 +139,7 @@ public class InventoryService {
                     String content = null;
                     List<String> lines = null;
                     if (playbook.getFilepath() == null){
-                        content = playbookService.readFileFromResources(playbook.getFilename());
+                        content = readFileFromResources(playbook.getFilename());
                         lines = List.of(content.split("\n"));
                     }
                     else {
@@ -195,7 +201,6 @@ public class InventoryService {
         }
 
         List<HostDTO> hosts = new ArrayList<>();
-
         sections.forEach((section, lines) -> {
             lines.forEach(line -> {
                 hosts.add(new HostDTO(section, line));
@@ -210,4 +215,6 @@ public class InventoryService {
 
         return hosts;
     }
+
+
 }

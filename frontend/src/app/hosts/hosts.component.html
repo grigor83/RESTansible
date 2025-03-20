@@ -1,14 +1,40 @@
-<div class="row">
 
-        <h1>Hosts file</h1>
+<div class="row">
+    <div class="column">
+        <h2>Inventories:</h2>
+        <select [(ngModel)]="selectedInventory" (change)="onInventorySelected($event)">
+          <option *ngFor="let inventory of inventories" [ngValue]="inventory">
+            {{ inventory.filename }}
+          </option>
+        </select>
+    </div>
 </div>
+
 
 <div class="row">
     <textarea placeholder="Loading hosts file..." [(ngModel)]="result"></textarea>
 </div>
 
 <div class="row">
-    <button (click)="save()" [disabled]="disableSaveButton">Save changes</button>
+    <button (click)="load()">Load inventory</button>
+    <button (click)="update()" [disabled]="disableUpdateButton">Update inventory</button>
+    <button (click)="openModal()">Create inventory</button>
+    <button (click)="delete()">Delete inventory</button>
+</div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h2>Create new inventory</h2>
+    <label style="margin-top: 15px;">Inventory name: </label>
+    <input type="text" [(ngModel)]="filename" placeholder="Enter filename" style="width: 17%">
+    <div class="row">
+      <textarea placeholder="Enter inventory content..." [(ngModel)]="result" style="width: 50vw;"></textarea>
+    </div>
+    <div>
+      <button (click)="createInventory()">OK</button>
+      <button (click)="closeModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <div *ngIf="isLoading" class="loading-overlay">

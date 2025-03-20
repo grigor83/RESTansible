@@ -1,4 +1,4 @@
-package mtel.model;
+package ansible.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

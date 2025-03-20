@@ -1,7 +1,7 @@
-package mtel.controllers;
+package ansible.controllers;
 
-import mtel.model.User;
-import mtel.services.UserService;
+import ansible.model.User;
+import ansible.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

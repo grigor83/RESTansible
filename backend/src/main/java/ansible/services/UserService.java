@@ -1,8 +1,8 @@
-package mtel.services;
+package ansible.services;
 
 import jakarta.transaction.Transactional;
-import mtel.model.User;
-import mtel.repository.UserRepository;
+import ansible.model.User;
+import ansible.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service

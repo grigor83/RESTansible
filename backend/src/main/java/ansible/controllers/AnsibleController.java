@@ -1,7 +1,7 @@
-package mtel.controllers;
+package ansible.controllers;
 
-import mtel.model.Playbook;
-import mtel.services.AnsibleService;
+import ansible.model.Playbook;
+import ansible.services.AnsibleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,6 @@
-package mtel.services;
+package ansible.services;
 
-import mtel.model.Playbook;
+import ansible.model.Playbook;
 import org.springframework.stereotype.Service;
 
 import java.io.*;

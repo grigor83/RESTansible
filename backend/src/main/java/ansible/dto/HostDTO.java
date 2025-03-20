@@ -1,4 +1,4 @@
-package mtel.dto;
+package ansible.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mtel.model.Playbook;
+import ansible.model.Playbook;
 
 @Data
 @Builder

@@ -1,7 +1,7 @@
-package mtel.repository;
+package ansible.repository;
 
 import jakarta.validation.constraints.NotBlank;
-import mtel.model.User;
+import ansible.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

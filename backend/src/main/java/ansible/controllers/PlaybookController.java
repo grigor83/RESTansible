@@ -1,6 +1,6 @@
-package mtel.controllers;
+package ansible.controllers;
 
-import mtel.services.PlaybookService;
+import ansible.services.PlaybookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,15 +49,19 @@ public class PlaybookController {
 
     @PostMapping()
     public ResponseEntity<?> createPlaybook(@RequestBody PlaybookRequest request) {
-        if (request.userId == null || request.filename == null || request.filename.isEmpty() ||
-                request.content == null || request.content.isEmpty()) {
-            return ResponseEntity.badRequest().body("User ID, filename and file content are required.");
-        }
-
         try {
             return ResponseEntity.ok(playbookService.createFile(request.userId, request.filename, request.content));
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{playbookId}")
+    public ResponseEntity<?> deletePlaybook(@PathVariable Integer playbookId) {
+        try {
+            return ResponseEntity.ok().body(playbookService.deletePlaybook(playbookId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

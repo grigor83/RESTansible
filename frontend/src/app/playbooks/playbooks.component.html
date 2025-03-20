@@ -18,6 +18,7 @@
     <button (click)="load()">Load playbook</button>
     <button (click)="save()" [disabled]="disableSaveButton">Save playbook</button>
     <button (click)="openModal()">Create playbook</button>
+    <button (click)="delete()">Delete playbook</button>
 </div>
 
 <div class="modal" *ngIf="isModalOpen">
