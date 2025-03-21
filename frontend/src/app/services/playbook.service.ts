@@ -6,19 +6,17 @@ import { Injectable } from '@angular/core';
 })
 export class PlaybookService {
 
-  private url = 'http://localhost:8080/ansible';
+  private url = 'http://localhost:8080/playbooks';
 
   constructor(private http: HttpClient) { }
 
 
-
-  play(playbook: any) {
-    return this.http.post<any>(`${this.url}`, playbook);
+  play(playbook: any, inventory: any) {
+    return this.http.get<any>(`${this.url}/${playbook.id}/${inventory.id}`)
   }
 
   getPlaybooks(userId: number|undefined) {
-    const url = 'http://localhost:8080/playbooks';
-    return this.http.get<any>(`${url}/${userId}`);
+    return this.http.get<any>(`${this.url}/${userId}`);
   }
 
   loadPlaybookContent(playbook: any) {
@@ -27,18 +25,15 @@ export class PlaybookService {
   }
 
   updatePlaybookContent(playbookId: number, newContent: any) {
-    const url = 'http://localhost:8080/playbooks';
-    return this.http.put(`${url}/${playbookId}`, newContent, { responseType: 'text' });
+    return this.http.put(`${this.url}/${playbookId}`, newContent, { responseType: 'text' });
   }
 
   createPlaybook(userId: number|undefined, filename: string, content: string) {
-    const url = 'http://localhost:8080/playbooks';
-    return this.http.post(`${url}`, { userId, filename, content });
+    return this.http.post(`${this.url}`, { userId, filename, content });
   }
 
   deletePlaybook(playbookId: any) {
-    const url = 'http://localhost:8080/playbooks';
-    return this.http.delete(`${url}/${playbookId}`, { responseType: 'text' });
+    return this.http.delete(`${this.url}/${playbookId}`, { responseType: 'text' });
   }
 
 

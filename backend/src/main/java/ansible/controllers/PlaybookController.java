@@ -19,6 +19,15 @@ public class PlaybookController {
         this.playbookService = playbookService;
     }
 
+    @GetMapping("/{playbookId}/{inventoryId}")
+    public ResponseEntity<?> runPlaybook(@PathVariable Integer playbookId, @PathVariable Integer inventoryId) throws IOException {
+        try {
+            return ResponseEntity.ok().body(playbookService.runPlaybook(playbookId, inventoryId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<?> getPlaybooks(@PathVariable Integer userId) {
         try {

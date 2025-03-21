@@ -17,6 +17,15 @@
         </option>
       </select>
   </div>
+
+  <div class="column">
+    <h2>Inventories:</h2>
+    <select [(ngModel)]="selectedInventory">
+      <option *ngFor="let inventory of inventories" [ngValue]="inventory">
+        {{ inventory.filename }}
+      </option>
+    </select>
+</div>
 </div>
 
 <div class="row">

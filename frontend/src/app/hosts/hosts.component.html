@@ -12,11 +12,10 @@
 
 
 <div class="row">
-    <textarea placeholder="Loading hosts file..." [(ngModel)]="result"></textarea>
+    <textarea placeholder="Loading hosts file..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)"></textarea>
 </div>
 
 <div class="row">
-    <button (click)="load()">Load inventory</button>
     <button (click)="update()" [disabled]="disableUpdateButton">Update inventory</button>
     <button (click)="openModal()">Create inventory</button>
     <button (click)="delete()">Delete inventory</button>
@@ -28,7 +27,7 @@
     <label style="margin-top: 15px;">Inventory name: </label>
     <input type="text" [(ngModel)]="filename" placeholder="Enter filename" style="width: 17%">
     <div class="row">
-      <textarea placeholder="Enter inventory content..." [(ngModel)]="result" style="width: 50vw;"></textarea>
+      <textarea placeholder="Enter inventory content..." [(ngModel)]="content" style="width: 50vw;"></textarea>
     </div>
     <div>
       <button (click)="createInventory()">OK</button>

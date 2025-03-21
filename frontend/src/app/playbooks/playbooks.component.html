@@ -11,12 +11,11 @@
 </div>
 
 <div class="row">
-    <textarea placeholder="Choose playbook and edit..." [(ngModel)]="result"></textarea>
+    <textarea placeholder="Choose playbook and edit..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)"></textarea>
 </div>
 
 <div class="row">
-    <button (click)="load()">Load playbook</button>
-    <button (click)="save()" [disabled]="disableSaveButton">Save playbook</button>
+    <button (click)="update()" [disabled]="disableUpdateButton">Update playbook</button>
     <button (click)="openModal()">Create playbook</button>
     <button (click)="delete()">Delete playbook</button>
 </div>
@@ -27,7 +26,7 @@
     <label style="margin-top: 15px;">Playbook name: </label>
     <input type="text" [(ngModel)]="filename" placeholder="Enter filename (e.g., playbook)" style="width: 17%">
     <div class="row">
-      <textarea placeholder="Enter playbooks content..." [(ngModel)]="result" style="width: 50vw;"></textarea>
+      <textarea placeholder="Enter playbooks content..." [(ngModel)]="content" style="width: 50vw;"></textarea>
     </div>
     <div>
       <button (click)="createPlaybook()">OK</button>

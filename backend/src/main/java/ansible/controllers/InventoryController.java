@@ -20,6 +20,15 @@ public class InventoryController {
     }
 
 
+    @GetMapping("/{userId}/names")
+    public ResponseEntity<?> getFileNames(@PathVariable Integer userId) {
+        try {
+            return ResponseEntity.ok().body(inventoryService.getFileNames(userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<?> getInventories(@PathVariable Integer userId) {
         try {
@@ -32,7 +41,7 @@ public class InventoryController {
     @GetMapping("/content/{inventoryId}")
     public ResponseEntity<?> getInventoryContent(@PathVariable Integer inventoryId) {
         try {
-            return ResponseEntity.ok().body(inventoryService.loadPlaybookContent(inventoryId));
+            return ResponseEntity.ok().body(inventoryService.loadInventoryContent(inventoryId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -66,13 +75,4 @@ public class InventoryController {
         }
     }
 
-
-    @GetMapping("/{userId}/data")
-    public ResponseEntity<?> getHostsAndPlaybooks(@PathVariable Integer userId) {
-        try {
-            return ResponseEntity.ok().body(inventoryService.loadHostsNames(userId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
-        }
-    }
 }

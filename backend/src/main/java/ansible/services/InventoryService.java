@@ -8,12 +8,9 @@ import ansible.repository.InventoryRepository;
 import ansible.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +40,7 @@ public class InventoryService {
         return inventoryRepository.findByUserIdOrUserIdIsNull(userId);
     }
 
-    public String loadPlaybookContent(Integer inventoryId) throws IOException {
+    public String loadInventoryContent(Integer inventoryId) throws IOException {
         Optional<Inventory> inventory = inventoryRepository.findById(inventoryId);
         if (inventory.isEmpty()) {
             throw new IOException("Playbook not found");
@@ -100,38 +97,50 @@ public class InventoryService {
         throw new IllegalArgumentException("Playbook id is invalid!");
     }
 
-    public List<HostDTO> loadHostsNames(int userId) throws IOException {
+    public Map<String, List<?>> getFileNames(int userId) throws IOException {
         // loads hosts name or group name from inventory file
         List<String> names = new ArrayList<>();
 
-        // Učitava sadržaj inventory fajla iz resources/ansible koristeći InputStream
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ClassPathResource("ansible/hosts").getInputStream()))) {
-            names.addAll(reader.lines()
-                    .filter(line -> line.contains("ansible_host") || line.contains("["))
-                    .toList());
-        }
-        // Učitava custom inventory fajl iz baze ako postoji
-        inventoryRepository.findByUserId(userId).ifPresent(inventory -> {
-            try {
-                Path filePath = Path.of(inventory.getFilepath());
-                names.addAll(Files.lines(filePath)
-                        .filter(line -> line.contains("ansible_host") || line.contains("["))
-                        .toList());
-            } catch (IOException e) {
-                throw new RuntimeException("Error reading inventory file: " + inventory.getFilepath(), e);
-            }
-        });
+        List<Inventory> inventories = inventoryRepository.findByUserIdOrUserIdIsNull(userId);
+        if (!inventories.isEmpty()) {
+            for (Inventory inventory : inventories) {
+                try {
+                    String content = null;
+                    List<String> lines = null;
+                    if (inventory.getFilepath() == null){
+                        content = readFileFromResources(inventory.getFilename());
+                        lines = List.of(content.split("\n"));
+                    }
+                    else {
+                        Path filePath = Path.of(inventory.getFilepath());
+                        lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+                    }
 
+                    for (String line : lines) {
+                        if (line.contains("ansible_host") || line.contains("[")) {
+                            names.add(line);
+                        }
+                    }
+                } catch (IOException i){
+                    continue;
+                }
+            }
+        }
+        
         List<HostDTO> hosts = parseNames(names);
         loadPlaybooksForHosts(userId, hosts);
 
-        return hosts;
+        Map<String, List<?>> response = new HashMap<>();
+        response.put("hosts", hosts);
+        response.put("inventories", inventories);
+        return response;
     }
 
     private void loadPlaybooksForHosts(int userId, List<HostDTO> hosts) throws IOException {
         Map<String, List<String>> fileNames = new LinkedHashMap<>();
 
         //Ucitava sve playbooks i provjerava da li sadrze ime hosta u svom sadrzaju
+        // Ako playbook sadrzi ime hosta, ime playbook fajla se dodaje u listu playbooka hosta
         List<Playbook> userPlaybooks = playbookService.getPlaybooks(userId);
         if (!userPlaybooks.isEmpty()) {
             for (Playbook playbook : userPlaybooks) {

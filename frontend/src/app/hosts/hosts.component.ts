@@ -14,11 +14,12 @@ import { UserService } from '../services/user.service';
 export class HostsComponent {
   inventories: any [] = [];
   selectedInventory: any;
-  result: string = '';
-  disableUpdateButton: boolean = false;
+  content: string = '';
+  oldContent: string = '';
+  disableUpdateButton: boolean = true;
   isLoading: boolean = true;
   isModalOpen: boolean = false
-  filename!: string
+  filename: string = '';
 
   constructor(private inventoryService: InventoryService, private userService: UserService) {}
 
@@ -27,7 +28,7 @@ export class HostsComponent {
       next: response => {
         this.inventories = response;
         this.selectedInventory = this.inventories[0];
-        this.isLoading = false;
+        this.load();        
       },
       error: error => {
         this.isLoading = false;
@@ -35,73 +36,83 @@ export class HostsComponent {
     });
   }
 
+  onTextChange(newValue: string) {
+    if (this.content != this.oldContent)
+      this.disableUpdateButton = false;
+    else
+      this.disableUpdateButton = true;
+  }
+
   onInventorySelected(event: any): void {
-    this.result = '';
-    this.disableUpdateButton = true;
+    this.content = '';
+    this.load();
+    //this.disableUpdateButton = true;
   }
 
   load() {
-    this.result = '';
+    this.content = '';
+    this.oldContent = '';
     this.isLoading = true;
+    this.disableUpdateButton = true;
     this.inventoryService.loadInventoryContent(this.selectedInventory)
     .subscribe({
       next: response => {
-        this.result = response;
-        this.disableUpdateButton = false;
+        this.content = response;
+        this.oldContent = response;
         this.isLoading = false;
       },
       error: error => {
-        this.result = "Error loading inventory content!";
+        this.content = "Error loading inventory content!";
         this.isLoading = false;
       }
     });
   }
 
   update(){
-    this.inventoryService.updateInventoryContent(this.selectedInventory.id, this.result)
+    this.disableUpdateButton = true;
+    this.isLoading = true;
+    this.inventoryService.updateInventoryContent(this.selectedInventory.id, this.content)
     .subscribe({
       next: response => {
         alert('Changes in file' + this.selectedInventory.filename + ' saved!')
-        this.disableUpdateButton = true;
         this.isLoading = false;
       },
       error: error => {
-        alert("Cannot update inventory file in resources!")
-        this.disableUpdateButton = true;
         this.isLoading = false;
+        this.content = this.oldContent
+        alert("Cannot update inventory file in resources!")
       }
     });
   }
 
   openModal(){
-    this.result = ""
+    this.content = ""
     this.isModalOpen = true;
   }
 
   createInventory() {
-    if (!this.filename.trim()) {
+    if (this.filename == '' || !this.filename.trim()) {
       alert('Filename is required!');
       return;
     }
 
     this.isLoading = false;
+    this.oldContent = this.content;
     if (this.filename.includes(".")){
       this.filename = this.filename.split(".")[0];
     }
 
-    this.inventoryService.createInventory(this.userService.activeUser?.id, this.filename, this.result)
+    this.inventoryService.createInventory(this.userService.activeUser?.id, this.filename, this.content)
       .subscribe({
         next: response => {
           alert('Created new inventory ' + this.filename + ' succesfully!')
           this.inventories.push(response);
           this.selectedInventory = response;
-          this.disableUpdateButton = true;
           this.isLoading = false;
           this.closeModal();
         },
         error: error => {
           alert("Error in creating new inventory file!")
-          this.disableUpdateButton = true;
           this.isLoading = false;
           this.closeModal();
         }
@@ -122,13 +133,10 @@ export class HostsComponent {
         alert('Deleted inventory ' + this.selectedInventory.filename + ' succesfully!')
         this.inventories = this.inventories.filter(inv => inv.id != this.selectedInventory.id)
         this.selectedInventory = this.inventories[0];
-        this.disableUpdateButton = true;
-        this.result = '';
-        this.isLoading = false;
+        this.load();
       },
       error: error => {
         alert("Error in deleting inventory file!")
-        this.disableUpdateButton = true;
         this.isLoading = false;
       }
     });

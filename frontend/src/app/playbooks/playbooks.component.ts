@@ -15,10 +15,11 @@ export class PlaybooksComponent implements OnInit {
 
   playbooks: any[] = [];
   selectedPlaybook: any;
-  result: string = '';
-  disableSaveButton: boolean = true;
+  oldContent: string = '';
+  content: string = '';
+  disableUpdateButton: boolean = true;
   isModalOpen: boolean = false
-  filename!: string
+  filename: string = '';
   isLoading: boolean = false;
 
   constructor(private playbookService: PlaybookService, private userService: UserService) {}
@@ -28,81 +29,90 @@ export class PlaybooksComponent implements OnInit {
       next: response => {
         this.playbooks = response;
         this.selectedPlaybook = this.playbooks[0];
+        this.load();
       },
       error: error => {
         this.isLoading = false;
       }
     });
+  }
+
+  onTextChange(newValue: string) {
+    if (this.content != this.oldContent)
+      this.disableUpdateButton = false;
+    else
+      this.disableUpdateButton = true;
   }
 
   onPlaybookSelected(event: any): void {
-    this.result = '';
-    this.disableSaveButton = true;
+    this.content = '';
+    this.load();
   }
 
   load() {
-    this.result = '';
+    this.content = '';
     this.isLoading = true;
+    this.disableUpdateButton = true;
     this.playbookService.loadPlaybookContent(this.selectedPlaybook)
     .subscribe({
       next: response => {
-        this.result = response;
-        this.disableSaveButton = false;
+        this.content = response;
+        this.oldContent = response;
         this.isLoading = false;
       },
       error: error => {
-        this.result = "Error loading playbook content!";
+        this.content = "Error loading playbook content!";
         this.isLoading = false;
       }
     });
   }
 
-  save(){
-    this.playbookService.updatePlaybookContent(this.selectedPlaybook.id, this.result)
+  update(){
+    this.disableUpdateButton = true;
+    this.isLoading = true;
+    this.playbookService.updatePlaybookContent(this.selectedPlaybook.id, this.content)
     .subscribe({
       next: response => {
-        alert('Changes in file' + this.selectedPlaybook.filename + ' saved!')
-        this.disableSaveButton = true;
         this.isLoading = false;
+        alert('Changes in file' + this.selectedPlaybook.filename + ' saved!')
       },
       error: error => {
-        alert("Cannot update playbook file in resources!")
-        this.disableSaveButton = true;
         this.isLoading = false;
+        alert("Cannot update playbook file in resources!");
+        this.content = this.oldContent;
       }
     });
   }
 
   openModal(){
-    this.result = ""
+    this.content = ""
     this.isModalOpen = true;
   }
 
   createPlaybook() {
-    if (!this.filename.trim()) {
+    if (this.filename == '' || !this.filename.trim()) {
       alert('Filename is required!');
       return;
     }
 
     this.isLoading = false;
+    this.oldContent = this.content;
     if (this.filename.includes(".")){
       this.filename = this.filename.split(".")[0];
     }
     this.filename = this.filename + ".yaml";
 
-    this.playbookService.createPlaybook(this.userService.activeUser?.id, this.filename, this.result)
+    this.playbookService.createPlaybook(this.userService.activeUser?.id, this.filename, this.content)
       .subscribe({
         next: response => {
           alert('Created new playbook ' + this.filename + ' succesfully!')
           this.playbooks.push(response);
           this.selectedPlaybook = response;
-          this.disableSaveButton = true;
           this.isLoading = false;
           this.closeModal();
         },
         error: error => {
           alert("Error in creating new playbook file!")
-          this.disableSaveButton = true;
           this.isLoading = false;
           this.closeModal();
         }
@@ -123,13 +133,10 @@ export class PlaybooksComponent implements OnInit {
         alert('Deleted playbook ' + this.selectedPlaybook.filename + ' succesfully!')
         this.playbooks = this.playbooks.filter(playbook => playbook.id != this.selectedPlaybook.id)
         this.selectedPlaybook = this.playbooks[0];
-        this.disableSaveButton = true;
-        this.result = '';
-        this.isLoading = false;
+        this.load();
       },
       error: error => {
         alert("Error in deleting playbook file!")
-        this.disableSaveButton = true;
         this.isLoading = false;
       }
     });

@@ -1,20 +1,19 @@
 package ansible.services;
 
 import ansible.RestAnsibleApplication;
+import ansible.model.Inventory;
+import ansible.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import ansible.model.Playbook;
 import ansible.repository.PlaybookRepository;
 import ansible.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +23,7 @@ import java.util.*;
 @Transactional
 public class PlaybookService {
 
+    private final InventoryRepository inventoryRepository;
     @Value("${upload.path}")
     private String uploadDir;
 
@@ -31,9 +31,10 @@ public class PlaybookService {
     private final UserRepository userRepository;
 
     @Autowired
-    public PlaybookService(PlaybookRepository playbookRepository, UserRepository userRepository) {
+    public PlaybookService(PlaybookRepository playbookRepository, UserRepository userRepository, InventoryRepository inventoryRepository) {
         this.playbookRepository = playbookRepository;
         this.userRepository = userRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     public List<Playbook> getPlaybooks(int userId) throws IOException {
@@ -65,7 +66,6 @@ public class PlaybookService {
         Files.writeString(Path.of(playbook.get().getFilepath()), content);
         return "Playbook updated successfully.";
     }
-
 
     public Playbook createFile(Integer userId, String filename, String content) throws IOException {
         if (userId == null || filename == null || filename.isEmpty() ||
@@ -99,4 +99,53 @@ public class PlaybookService {
         throw new IllegalArgumentException("Playbook id is invalid!");
     }
 
+    public Map<String, String> runPlaybook(Integer playbookId, Integer inventoryId) throws Exception {
+        Map<String, String> response = new HashMap<>();
+
+        Inventory inventory = inventoryRepository.findById(inventoryId).orElse(null);
+        Playbook playbook = playbookRepository.findById(playbookId).orElse(null);
+        if (playbook == null) {
+            throw new Exception("Playbook not found");
+        }
+        if (inventory == null) {
+            throw new Exception("Inventory not found");
+        }
+
+        String playbookPath = "", inventoryPath = "";
+        // Extract playbook and inventory files from resources
+        if (playbook.getFilepath() == null) {
+            playbookPath = RestAnsibleApplication.extractResource(playbook.getFilename());
+        }
+        else
+            playbookPath = "C:" + playbook.getFilepath();
+        if (inventory.getFilepath() == null) {
+            inventoryPath = RestAnsibleApplication.extractResource(inventory.getFilename());
+        }
+        else
+            inventoryPath = "C:" + inventory.getFilepath();
+        // Convert to WSL format
+        String wslPlaybookPath = RestAnsibleApplication.convertToWslPath(playbookPath);
+        String wslInventoryPath = RestAnsibleApplication.convertToWslPath(inventoryPath);
+        // Run Ansible in WSL
+        ProcessBuilder processBuilder = new ProcessBuilder("wsl", "ansible-playbook", "-i", wslInventoryPath, wslPlaybookPath);
+        //processBuilder.directory(workingDir);
+        processBuilder.redirectErrorStream(true);
+        // Start the process
+        Process process = processBuilder.start();
+
+        // Read the output
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder outputBuffer = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+            outputBuffer.append(line).append("\n");
+        }
+
+        // Wait for the process to complete
+        int exitCode = process.waitFor();
+        response.put("output", outputBuffer.toString());
+        response.put("exitCode", String.valueOf(exitCode));
+        return response;
+    }
 }

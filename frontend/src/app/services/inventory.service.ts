@@ -10,7 +10,7 @@ export class InventoryService {
   constructor(private http: HttpClient) { }
 
   getHostsAndPlaybooks(userId: number) {
-    return this.http.get<any>(`${this.url}/${userId}/data`);
+    return this.http.get<any>(`${this.url}/${userId}/names`);
   }
 
   getInventories(userId: number|undefined) {

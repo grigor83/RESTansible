@@ -18,6 +18,8 @@ export class DevicesComponent implements OnInit {
   selectedHost: any;
   playbooks: any[] = [];
   selectedPlaybook: any;
+  inventories: any[] = [];
+  selectedInventory: any;
   result: string = '';
   isLoading: boolean = false;
 
@@ -27,10 +29,12 @@ export class DevicesComponent implements OnInit {
     if (this.userService.activeUser != null){
       this.inventoryService.getHostsAndPlaybooks(this.userService.activeUser.id).subscribe({
         next: response => {
-          this.hosts = response;
+          this.hosts = response.hosts;
           this.selectedHost = this.hosts[0]
           this.playbooks = this.selectedHost.playbooks;
           this.selectedPlaybook = this.playbooks[0];
+          this.inventories = response.inventories
+          this.selectedInventory = this.inventories[0]
         },
         error: error => {
           this.isLoading = false;
@@ -47,7 +51,7 @@ export class DevicesComponent implements OnInit {
   play() {
     this.result = '';
     this.isLoading = true;
-    this.playbookService.play(this.selectedPlaybook).subscribe({
+    this.playbookService.play(this.selectedPlaybook, this.selectedInventory).subscribe({
       next: response => {
         this.result = response.output;
         this.isLoading = false
