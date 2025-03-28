@@ -79,7 +79,7 @@ public class InventoryService {
         Inventory inventory = new Inventory();
         inventory.setUser(userRepository.findById(userId).get());
         inventory.setFilename(filename);
-        inventory.setFilepath(filePath.toString());
+        inventory.setFilepath(filePath.toFile().getAbsolutePath());
 
         return inventoryRepository.save(inventory);
     }
@@ -169,7 +169,9 @@ public class InventoryService {
 
         fileNames.forEach((key, value) -> {
             for (HostDTO host : hosts) {
-                if (value.contains(host.getGroupName()) || value.contains(host.getName().split(" ")[0].trim()) || value.contains("all")) {
+                if (value.contains(host.getGroupName().trim().replaceAll("[\\[\\]]", "")) ||
+                        value.contains(host.getName().split(" ")[0].trim()) ||
+                        value.contains("all")) {
                     Optional<Playbook> playbook = userPlaybooks.stream()
                             .filter(p -> p.getFilename().equals(key))
                             .findAny();
@@ -212,7 +214,7 @@ public class InventoryService {
         List<HostDTO> hosts = new ArrayList<>();
         sections.forEach((section, lines) -> {
             lines.forEach(line -> {
-                hosts.add(new HostDTO(section, line));
+                hosts.add(new HostDTO(section.trim(), line.trim()));
             });
         });
 

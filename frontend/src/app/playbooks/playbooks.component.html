@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-    <textarea placeholder="Choose playbook and edit..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)"></textarea>
+    <textarea placeholder="Choose playbook and edit..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)" (keydown)="onTabPress($event)"></textarea>
 </div>
 
 <div class="row">
@@ -26,7 +26,7 @@
     <label style="margin-top: 15px;">Playbook name: </label>
     <input type="text" [(ngModel)]="filename" placeholder="Enter filename (e.g., playbook)" style="width: 17%">
     <div class="row">
-      <textarea placeholder="Enter playbooks content..." [(ngModel)]="content" style="width: 50vw;"></textarea>
+      <textarea placeholder="Enter playbooks content..." [(ngModel)]="content" (keydown)="onTabPress($event)" style="width: 50vw;"></textarea>
     </div>
     <div>
       <button (click)="createPlaybook()">OK</button>

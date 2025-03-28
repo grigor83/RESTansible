@@ -12,7 +12,7 @@
 
 
 <div class="row">
-    <textarea placeholder="Loading hosts file..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)"></textarea>
+    <textarea placeholder="Loading hosts file..." [(ngModel)]="content" (ngModelChange)="onTextChange($event)" (keydown)="onTabPress($event)"></textarea>
 </div>
 
 <div class="row">
@@ -27,7 +27,7 @@
     <label style="margin-top: 15px;">Inventory name: </label>
     <input type="text" [(ngModel)]="filename" placeholder="Enter filename" style="width: 17%">
     <div class="row">
-      <textarea placeholder="Enter inventory content..." [(ngModel)]="content" style="width: 50vw;"></textarea>
+      <textarea placeholder="Enter inventory content..." [(ngModel)]="content" (keydown)="onTabPress($event)" style="width: 50vw;"></textarea>
     </div>
     <div>
       <button (click)="createInventory()">OK</button>

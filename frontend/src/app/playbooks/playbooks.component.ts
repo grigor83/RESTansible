@@ -44,6 +44,23 @@ export class PlaybooksComponent implements OnInit {
       this.disableUpdateButton = true;
   }
 
+  onTabPress(event: KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault(); // Sprečite podrazumevano ponašanje Tab-a (prebacivanje fokusa)
+      
+      // Dodajte Tab karakter u textarea
+      const textarea = event.target as HTMLTextAreaElement;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+  
+      // Umetnite Tab karakter na poziciju kursora
+      textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+  
+      // Premestite kursor nakon unosa Tab karaktera
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+    }
+  }
+
   onPlaybookSelected(event: any): void {
     this.content = '';
     this.load();
@@ -121,6 +138,7 @@ export class PlaybooksComponent implements OnInit {
 
   closeModal() {
     this.filename = '';
+    this.content = this.oldContent;
     this.isModalOpen = false;
   }
 

@@ -5,13 +5,13 @@ import { InventoryService } from '../services/inventory.service';
 import { UserService } from '../services/user.service';
 
 @Component({
-  selector: 'app-hosts',
+  selector: 'app-inventories',
   standalone: true,
   imports: [FormsModule, NgIf, NgFor],
-  templateUrl: './hosts.component.html',
-  styleUrl: './hosts.component.css'
+  templateUrl: './inventories.component.html',
+  styleUrl: './inventories.component.css'
 })
-export class HostsComponent {
+export class InventoriesComponent {
   inventories: any [] = [];
   selectedInventory: any;
   content: string = '';
@@ -42,6 +42,24 @@ export class HostsComponent {
     else
       this.disableUpdateButton = true;
   }
+
+  onTabPress(event: KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault(); // Sprečite podrazumevano ponašanje Tab-a (prebacivanje fokusa)
+      
+      // Dodajte Tab karakter u textarea
+      const textarea = event.target as HTMLTextAreaElement;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+  
+      // Umetnite Tab karakter na poziciju kursora
+      textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+  
+      // Premestite kursor nakon unosa Tab karaktera
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+    }
+  }
+  
 
   onInventorySelected(event: any): void {
     this.content = '';
@@ -121,6 +139,7 @@ export class HostsComponent {
 
   closeModal() {
     this.filename = '';
+    this.content = this.oldContent;
     this.isModalOpen = false;
   }
 

@@ -1,6 +1,6 @@
 ---
 - name: Configure Loopback Interface on Cisco Sandbox IOS XE
-  hosts: bezvezni
+  hosts: iosxe
   gather_facts: no
   tasks:
     - name: Configure Loopback0 Interface

@@ -10,5 +10,5 @@ import { SidenavComponent } from "./sidenav/sidenav.component";
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'mtel-ansible';
+  title = 'rest-ansible';
 }

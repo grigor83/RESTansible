@@ -25,7 +25,7 @@ public class PlaybookService {
 
     private final InventoryRepository inventoryRepository;
     @Value("${upload.path}")
-    private String uploadDir;
+    private String uploadsDir;
 
     private final PlaybookRepository playbookRepository;
     private final UserRepository userRepository;
@@ -73,7 +73,7 @@ public class PlaybookService {
             throw new IOException("User ID, filename or content cannot be empty");
         }
 
-        Path filePath = Paths.get(uploadDir, UUID.randomUUID() + "_" + filename);
+        Path filePath = Paths.get(uploadsDir, UUID.randomUUID() + "_" + filename);
         // Kreiraj upload folder ako ne postoji
         Files.createDirectories(filePath.getParent());
         Files.writeString(filePath, content);
@@ -81,8 +81,8 @@ public class PlaybookService {
         Playbook playbook = new Playbook();
         playbook.setUser(userRepository.findById(userId).get());
         playbook.setFilename(filename);
-        playbook.setFilepath(filePath.toString());
-
+        playbook.setFilepath(filePath.toFile().getAbsolutePath());
+        
         return playbookRepository.save(playbook);
     }
 
@@ -112,17 +112,18 @@ public class PlaybookService {
         }
 
         String playbookPath = "", inventoryPath = "";
-        // Extract playbook and inventory files from resources
         if (playbook.getFilepath() == null) {
-            playbookPath = RestAnsibleApplication.extractResource(playbook.getFilename());
+            // Extract playbook file from resources
+            playbookPath = RestAnsibleApplication.copyResourceFile(playbook.getFilename());
         }
         else
-            playbookPath = "C:" + playbook.getFilepath();
+            playbookPath = playbook.getFilepath();
         if (inventory.getFilepath() == null) {
-            inventoryPath = RestAnsibleApplication.extractResource(inventory.getFilename());
+            // Extract inventory file from resources
+            inventoryPath = RestAnsibleApplication.copyResourceFile(inventory.getFilename());
         }
         else
-            inventoryPath = "C:" + inventory.getFilepath();
+            inventoryPath = inventory.getFilepath();
         // Convert to WSL format
         String wslPlaybookPath = RestAnsibleApplication.convertToWslPath(playbookPath);
         String wslInventoryPath = RestAnsibleApplication.convertToWslPath(inventoryPath);

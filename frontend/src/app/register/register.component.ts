@@ -26,6 +26,7 @@ export class RegisterComponent {
       next: response => {
             alert("Uspješno ste podnijeli zahtjev za registraciju!");
             registerForm.reset();
+            this.login()
       },
       error: error => {
         alert("Uneseno korisničko ime je već zauzeto!");

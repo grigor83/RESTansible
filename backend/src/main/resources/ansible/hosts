@@ -13,10 +13,9 @@ ansible_network_os=cisco.ios.ios
 ansible_port=22
 subnet_id=50
 
-bezvezni ansible_host=devnetsandboxiosxe.cisco.com
 
 [iosxr]
-drugi_ruter ansible_host=sandbox-iosxr-1.cisco.com
+iosxr_ruter ansible_host=sandbox-iosxr-1.cisco.com
 
 [iosxr:vars]
 ansible_connection=ansible.netcommon.network_cli
@@ -30,12 +29,8 @@ ansible_port=22
 subnet_id=50
 
 
-
-[switches]
-cat9k ansible_host=10.10.20.100
-
 [nso]
-treci_ruter ansible_host=sbx-nxos-mgmt.cisco.com
+nexus_switches ansible_host=sbx-nxos-mgmt.cisco.com
 
 [nso:vars]
 ansible_user=admin

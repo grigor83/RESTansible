@@ -6,13 +6,13 @@ import { UserService } from '../services/user.service';
 import { InventoryService } from '../services/inventory.service';
 
 @Component({
-  selector: 'app-devices',
+  selector: 'app-play',
   standalone: true,
   imports: [NgFor, FormsModule, NgIf],
-  templateUrl: './devices.component.html',
-  styleUrl: './devices.component.css'
+  templateUrl: './play.component.html',
+  styleUrl: './play.component.css'
 })
-export class DevicesComponent implements OnInit {
+export class PlayComponent implements OnInit {
 
   hosts: any[] = [];
   selectedHost: any;
