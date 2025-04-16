@@ -41,7 +41,7 @@ CREATE TABLE playbook
 insert into user(username, password, phone, email) values ('admin','8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '', '');
 insert into inventory(filename) values ('hosts');
 insert into playbook(filename) values ('create_loopback0.yaml'), ('create_loopbacks.yaml'), ('delete_loopback0.yaml'), 
-('interfaces_facts.yaml'), ('ios_facts.yaml'), ('list_interfaces.yaml');
+('interfaces_facts.yaml'), ('ios_facts.yaml'), ('list_interfaces.yaml'), ('show_version.yaml');
 
 
 
