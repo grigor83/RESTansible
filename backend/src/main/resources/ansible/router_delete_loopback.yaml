@@ -1,0 +1,38 @@
+---
+- name: Delete dynamic Sandbox Loopback interface on IOS XR if it exists
+  hosts: iosxr
+  gather_facts: no
+
+  vars:
+    loopback_number: 42
+
+  tasks:
+    - name: Check if Loopback{{ loopback_number }} interface exists
+      cisco.iosxr.iosxr_command:
+        commands:
+          - show running-config interface Loopback{{ loopback_number }}
+      register: check_loopback
+      failed_when: false   
+      changed_when: false
+
+    - name: Set fact if interface exists
+      set_fact:
+        loopback_exists: "{{ 'Loopback' + loopback_number|string in check_loopback.stdout[0] }}"
+
+    - name: Delete Loopback{{ loopback_number }} interface if it exists
+      when: loopback_exists
+      cisco.iosxr.iosxr_command:
+        commands:
+          - configure
+          - no interface Loopback{{ loopback_number }}
+          - commit
+          - end
+
+    - name: Print deletion result
+      debug:
+        msg: >-
+          {% if loopback_exists %}
+            Loopback{{ loopback_number }} was deleted.
+          {% else %}
+            Loopback{{ loopback_number }} does not exist, nothing to delete.
+          {% endif %}

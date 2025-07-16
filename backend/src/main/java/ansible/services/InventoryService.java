@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ansible.RestAnsibleApplication.readFileFromResources;
 
@@ -137,7 +139,7 @@ public class InventoryService {
     }
 
     private void loadPlaybooksForHosts(int userId, List<HostDTO> hosts) throws IOException {
-        Map<String, List<String>> fileNames = new LinkedHashMap<>();
+        Map<String, Set<String>> fileNames = new LinkedHashMap<>();
 
         //Ucitava sve playbooks i provjerava da li sadrze ime hosta u svom sadrzaju
         // Ako playbook sadrzi ime hosta, ime playbook fajla se dodaje u listu playbooka hosta
@@ -158,7 +160,19 @@ public class InventoryService {
 
                     for (String line : lines) {
                         if (line.contains("hosts:")) {
-                            fileNames.put(playbook.getFilename(), Arrays.asList(line.split(":")[1].trim().split(",")));
+                            //fileNames.put(playbook.getFilename(), Arrays.asList(line.split(":")[1].trim().split(",")));
+                            Set<String> newHosts = Arrays.stream(line.split(":")[1].trim().split(","))
+                                    .map(String::trim)
+                                    .collect(Collectors.toSet());
+                            // Dodaj u mapu — automatski spaja nove hostove s postojećima
+                            fileNames.merge(
+                                    playbook.getFilename(),
+                                    newHosts,
+                                    (existing, incoming) -> {
+                                        existing.addAll(incoming);
+                                        return existing;
+                                    }
+                            );
                         }
                     }
                 } catch (IOException i){

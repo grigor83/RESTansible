@@ -1,0 +1,30 @@
+---
+- name: Configure dynamic Loopback interface on Sandbox router IOS XR
+  hosts: iosxr
+  gather_facts: no
+
+  vars:
+    loopback_number: 42   
+    ip_prefix: "10.100"                        
+    subnet_mask: "255.255.255.255"
+
+  tasks:
+    - name: Configure Loopback{{ loopback_number }} interface with IP address {{ ip_prefix }}.{{ loopback_number }}.1
+      cisco.iosxr.iosxr_command:
+        commands:
+          - configure
+          - interface Loopback{{ loopback_number }}
+          - ipv4 address {{ ip_prefix }}.{{ loopback_number }}.1 {{ subnet_mask }}
+          - no shutdown
+          - commit
+          - end
+
+    - name: Verify interface config
+      cisco.iosxr.iosxr_command:
+        commands:
+          - show ipv4 interface brief
+      register: result
+
+    - name: Print interface config
+      debug:
+        var: result.stdout_lines

@@ -1,0 +1,34 @@
+---
+- name: Retrieve facts from IOS XR router
+  hosts: iosxr
+  gather_facts: no
+  tasks:
+    - name: retrieve iosxr facts
+      cisco.iosxr.iosxr_facts:
+        gather_subset:
+          - all
+
+    - name: display router model, version and serial number
+      debug:
+        msg: "Router is model {{ ansible_net_model }}, runs version {{ ansible_net_version }}, and has serial number {{ ansible_net_serialnum }}"
+    - name: print out interface information
+      debug:
+        var: ansible_net_interfaces
+
+
+- name: Retrieve facts from NX-OS switch
+  hosts: nxos
+  gather_facts: no
+  tasks:
+    - name: retrieve nxos facts
+      cisco.nxos.nxos_facts:
+        gather_subset:
+          - all
+
+    - name: display switch model, version and serial number
+      debug:
+        msg: "Switch is model {{ ansible_net_model }}, runs version {{ ansible_net_version }}, and has serial number {{ ansible_net_serialnum }}"
+
+    - name: print out interface information
+      debug:
+        var: ansible_net_interfaces
